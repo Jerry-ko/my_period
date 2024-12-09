@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:my_period/screens/mentsrual_day_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MenstrualCycle extends StatefulWidget {
@@ -12,9 +13,9 @@ class MenstrualCycle extends StatefulWidget {
 class _MenstrualCycleState extends State<MenstrualCycle> {
   late SharedPreferences prefs;
   final List<int> periodList = List.generate(31, (int index) => index + 20);
-  int selectedPeriod = 0;
+  late int selectedPeriod = 0;
 
-  initPrefs() async {
+  Future<void> initPrefs() async {
     prefs = await SharedPreferences.getInstance();
     final period = prefs.getInt('period');
 
@@ -24,6 +25,9 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
       });
     } else {
       prefs.setInt('period', 0);
+      setState(() {
+        selectedPeriod = 0;
+      });
     }
   }
 
@@ -34,7 +38,18 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
   }
 
   onNextTap() {
-    print(selectedPeriod);
+    prefs.setInt('period', selectedPeriod);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const MentsrualDayScreen(),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -54,7 +69,7 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
                   const Text(
                     '평균 월경주기를 입력해주세요',
                     style: TextStyle(
-                      fontSize: 26,
+                      fontSize: 28,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -118,29 +133,23 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
             ),
             GestureDetector(
               onTap: onNextTap,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(15),
-                        child: Text(
-                          '다음',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.all(15),
+                  child: Text(
+                    '다음',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ],
