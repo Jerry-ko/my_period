@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:my_period/screens/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MentsrualDayScreen extends StatefulWidget {
   const MentsrualDayScreen({super.key});
@@ -8,8 +11,44 @@ class MentsrualDayScreen extends StatefulWidget {
 }
 
 class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
-  late DateTime selectedStartDate = DateTime.now();
-  late DateTime selectedEndDate = DateTime.now();
+  DateTime selectedStartDate = DateTime.now();
+  DateTime selectedEndDate = DateTime.now();
+  late SharedPreferences prefs;
+
+//todo: 메서드 컴포넌트
+  initStartDatePrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final stringStartDate = prefs.getString('startDate');
+    final startDate =
+        stringStartDate != null ? DateTime.parse(stringStartDate) : null;
+
+    if (startDate != null) {
+      selectedStartDate = startDate;
+    } else {
+      selectedStartDate = DateTime.now();
+      await prefs.setString('startDate', DateTime.now().toIso8601String());
+    }
+  }
+
+  initEndDatePrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final stringEndDate = prefs.getString('endDate');
+    final endDate =
+        stringEndDate != null ? DateTime.parse(stringEndDate) : null;
+    if (endDate != null) {
+      selectedEndDate = endDate;
+    } else {
+      selectedEndDate = DateTime.now();
+      await prefs.setString('endDate', DateTime.now().toIso8601String());
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initStartDatePrefs();
+    initEndDatePrefs();
+  }
 
   //todo: 메서드 추출
   Future<void> onStartCalenderTap(BuildContext context) async {
@@ -21,12 +60,9 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
     );
 
     if (selected != null) {
+      await prefs.setString('startDate', selected.toIso8601String());
       setState(() {
         selectedStartDate = selected;
-      });
-    } else {
-      setState(() {
-        selectedStartDate = DateTime.now();
       });
     }
   }
@@ -40,12 +76,9 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
     );
 
     if (selected != null) {
+      await prefs.setString('endDate', selected.toIso8601String());
       setState(() {
         selectedEndDate = selected;
-      });
-    } else {
-      setState(() {
-        selectedEndDate = DateTime.now();
       });
     }
   }
@@ -53,6 +86,7 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(40),
         child: Column(
@@ -64,7 +98,7 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                   Column(
                     children: [
                       const SizedBox(
-                        height: 150,
+                        height: 40,
                       ),
                       const Align(
                         child: Text(
@@ -95,7 +129,7 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                             onTap: () => onStartCalenderTap(context),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
+                                color: Colors.grey.shade200,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Padding(
@@ -139,7 +173,7 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                             onTap: () => onEndCalenderTap(context),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
+                                color: Colors.grey.shade200,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Padding(
@@ -175,10 +209,16 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
               ),
             ),
             GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const HomeScreen()));
+              },
               child: Container(
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Colors.green,
+                  color: Theme.of(context).primaryColor,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Padding(
@@ -186,9 +226,10 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                   child: Text(
                     '설정 완료',
                     style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

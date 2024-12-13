@@ -24,7 +24,7 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
         selectedPeriod = period;
       });
     } else {
-      prefs.setInt('period', 0);
+      await prefs.setInt('period', 0);
       setState(() {
         selectedPeriod = 0;
       });
@@ -35,21 +35,6 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
   void initState() {
     super.initState();
     initPrefs();
-  }
-
-  onNextTap() {
-    prefs.setInt('period', selectedPeriod);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const MentsrualDayScreen(),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -101,7 +86,8 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
                         squeeze: 1.2,
                         useMagnifier: true,
                         itemExtent: 32.0,
-                        onSelectedItemChanged: (int selectedItem) {
+                        onSelectedItemChanged: (int selectedItem) async {
+                          await prefs.setInt('period', selectedItem);
                           setState(() {
                             selectedPeriod = selectedItem;
                           });
@@ -132,11 +118,16 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
               ),
             ),
             GestureDetector(
-              onTap: onNextTap,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MentsrualDayScreen(),
+                ),
+              ),
               child: Container(
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Colors.green,
+                  color: Theme.of(context).primaryColor,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Padding(
