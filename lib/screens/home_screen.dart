@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -10,9 +11,48 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int currentPageIndex = 0;
+  late SharedPreferences prefs;
+  // todo: 상수로 빼기
+  final List<int> periodList = List.generate(31, (int index) => index + 20);
+
+  int period = 28;
+  int periodDays = 0;
+  DateTime startDate = DateTime.now();
+  DateTime endDate = DateTime.now();
+  DateTime ovulationDay = DateTime.now();
+  DateTime expectedPeriodDate = DateTime.now();
+  int numberOfDaysLeft = 5;
+
+  initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      period = periodList[prefs.getInt('period')!];
+      startDate = DateTime.parse(prefs.getString('startDate')!);
+      endDate = DateTime.parse(prefs.getString('endDate')!);
+      periodDays = endDate.difference(startDate).inDays;
+      ovulationDay = startDate.add(Duration(days: period - 14));
+      expectedPeriodDate = ovulationDay.add(const Duration(days: 14));
+      numberOfDaysLeft = expectedPeriodDate.difference(DateTime.now()).inDays;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initPrefs();
+  }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('period: $period');
+    debugPrint('startDate: $startDate');
+    debugPrint('endDate: $endDate');
+    debugPrint('periodDays: $periodDays');
+    debugPrint('ovulationDay: $ovulationDay');
+    debugPrint('expectedDate: $expectedPeriodDate');
+    debugPrint('left: $numberOfDaysLeft');
+
     return Scaffold(
       appBar: AppBar(),
       bottomNavigationBar: NavigationBar(
@@ -59,9 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(
                     height: 30,
                   ),
-                  const Text(
-                    '7일 전',
-                    style: TextStyle(
+                  Text(
+                    '$numberOfDaysLeft일 전',
+                    style: const TextStyle(
                       fontSize: 28,
                     ),
                   ),

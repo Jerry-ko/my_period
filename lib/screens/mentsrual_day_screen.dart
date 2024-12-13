@@ -1,5 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:my_period/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,35 +12,44 @@ class MentsrualDayScreen extends StatefulWidget {
 }
 
 class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
-  DateTime selectedStartDate = DateTime.now();
-  DateTime selectedEndDate = DateTime.now();
+  DateTime startDate = DateTime.now();
+  DateTime endDate = DateTime.now();
+
   late SharedPreferences prefs;
 
 //todo: 메서드 컴포넌트
   initStartDatePrefs() async {
     prefs = await SharedPreferences.getInstance();
     final stringStartDate = prefs.getString('startDate');
-    final startDate =
+    final dateTimeStartDate =
         stringStartDate != null ? DateTime.parse(stringStartDate) : null;
 
-    if (startDate != null) {
-      selectedStartDate = startDate;
+    if (dateTimeStartDate != null) {
+      setState(() {
+        startDate = dateTimeStartDate;
+      });
     } else {
-      selectedStartDate = DateTime.now();
       await prefs.setString('startDate', DateTime.now().toIso8601String());
+      setState(() {
+        startDate = DateTime.now();
+      });
     }
   }
 
   initEndDatePrefs() async {
     prefs = await SharedPreferences.getInstance();
     final stringEndDate = prefs.getString('endDate');
-    final endDate =
+    final dateTimeEndDate =
         stringEndDate != null ? DateTime.parse(stringEndDate) : null;
-    if (endDate != null) {
-      selectedEndDate = endDate;
+    if (dateTimeEndDate != null) {
+      setState(() {
+        endDate = dateTimeEndDate;
+      });
     } else {
-      selectedEndDate = DateTime.now();
       await prefs.setString('endDate', DateTime.now().toIso8601String());
+      setState(() {
+        endDate = DateTime.now();
+      });
     }
   }
 
@@ -51,36 +61,30 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
   }
 
   //todo: 메서드 추출
-  Future<void> onStartCalenderTap(BuildContext context) async {
-    final DateTime? selected = await showDatePicker(
+  void onStartCalenderTap(Widget child) {
+    showCupertinoModalPopup(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(DateTime.now().year - 1),
-      lastDate: DateTime(DateTime.now().year + 1),
+      builder: (context) => Container(
+          height: 216,
+          padding: const EdgeInsets.only(top: 6.0),
+          margin:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          color: CupertinoColors.systemBackground.resolveFrom(context),
+          child: SafeArea(top: false, child: child)),
     );
-
-    if (selected != null) {
-      await prefs.setString('startDate', selected.toIso8601String());
-      setState(() {
-        selectedStartDate = selected;
-      });
-    }
   }
 
-  Future<void> onEndCalenderTap(BuildContext context) async {
-    final DateTime? selected = await showDatePicker(
+  void onEndCalenderTap(Widget child) {
+    showCupertinoModalPopup(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(DateTime.now().year - 1),
-      lastDate: DateTime(DateTime.now().year + 1),
+      builder: (context) => Container(
+          height: 216,
+          padding: const EdgeInsets.only(top: 6.0),
+          margin:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          color: CupertinoColors.systemBackground.resolveFrom(context),
+          child: SafeArea(top: false, child: child)),
     );
-
-    if (selected != null) {
-      await prefs.setString('endDate', selected.toIso8601String());
-      setState(() {
-        selectedEndDate = selected;
-      });
-    }
   }
 
   @override
@@ -126,7 +130,21 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                           ),
                           // todo: 위젯으로 추출
                           GestureDetector(
-                            onTap: () => onStartCalenderTap(context),
+                            onTap: () => onStartCalenderTap(
+                              CupertinoDatePicker(
+                                initialDateTime: startDate,
+                                mode: CupertinoDatePickerMode.date,
+                                use24hFormat: true,
+                                onDateTimeChanged: (DateTime newTime) async {
+                                  await prefs.setString(
+                                      'startDate', newTime.toIso8601String());
+
+                                  setState(() {
+                                    startDate = newTime;
+                                  });
+                                },
+                              ),
+                            ),
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade200,
@@ -140,7 +158,7 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                                   children: [
                                     const Icon(Icons.calendar_month),
                                     Text(
-                                      '${selectedStartDate.year}년 ${selectedStartDate.month}월 ${selectedStartDate.day}일',
+                                      '${startDate.year}년 ${startDate.month}월 ${startDate.day}일',
                                       style: const TextStyle(
                                         fontSize: 18,
                                       ),
@@ -170,7 +188,24 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                             height: 5,
                           ),
                           GestureDetector(
-                            onTap: () => onEndCalenderTap(context),
+                            onTap: () => onEndCalenderTap(
+                              CupertinoDatePicker(
+                                initialDateTime: endDate,
+                                minimumDate: startDate,
+                                maximumDate: startDate.add(
+                                  const Duration(days: 180),
+                                ),
+                                mode: CupertinoDatePickerMode.date,
+                                use24hFormat: true,
+                                onDateTimeChanged: (DateTime newTime) async {
+                                  await prefs.setString(
+                                      'endDate', newTime.toIso8601String());
+                                  setState(() {
+                                    endDate = newTime;
+                                  });
+                                },
+                              ),
+                            ),
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade200,
@@ -184,7 +219,7 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                                   children: [
                                     const Icon(Icons.calendar_month),
                                     Text(
-                                      '${selectedEndDate.year}년 ${selectedEndDate.month}월 ${selectedEndDate.day}일',
+                                      '${endDate.year}년 ${endDate.month}월 ${endDate.day}일',
                                       style: const TextStyle(
                                         fontSize: 18,
                                       ),

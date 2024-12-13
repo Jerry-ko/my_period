@@ -13,11 +13,11 @@ class MenstrualCycle extends StatefulWidget {
 class _MenstrualCycleState extends State<MenstrualCycle> {
   late SharedPreferences prefs;
   final List<int> periodList = List.generate(31, (int index) => index + 20);
-  late int selectedPeriod = 0;
+  int selectedPeriod = 0;
 
   Future<void> initPrefs() async {
     prefs = await SharedPreferences.getInstance();
-    final period = prefs.getInt('period');
+    final int? period = prefs.getInt('period');
 
     if (period != null) {
       setState(() {
@@ -39,6 +39,7 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
 
   @override
   Widget build(BuildContext context) {
+    print('w$selectedPeriod');
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(40),
@@ -86,6 +87,8 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
                         squeeze: 1.2,
                         useMagnifier: true,
                         itemExtent: 32.0,
+                        scrollController: FixedExtentScrollController(
+                            initialItem: selectedPeriod),
                         onSelectedItemChanged: (int selectedItem) async {
                           await prefs.setInt('period', selectedItem);
                           setState(() {
