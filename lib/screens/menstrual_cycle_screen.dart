@@ -39,7 +39,6 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
 
   @override
   Widget build(BuildContext context) {
-    print('w$selectedPeriod');
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(40),
