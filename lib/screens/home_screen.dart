@@ -1,5 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:my_period/models/period_cycle_model.dart';
 import 'package:my_period/screens/edit_period_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -14,29 +16,39 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int currentPageIndex = 0;
   late SharedPreferences prefs;
-  // todo: 상수로 빼기
-  final List<int> periodList = List.generate(31, (int index) => index + 20);
 
-  int period = 28;
-  int periodDays = 0;
-  DateTime startDate = DateTime.now();
-  DateTime endDate = DateTime.now();
-  DateTime ovulationDay = DateTime.now();
-  DateTime expectedPeriodDate = DateTime.now();
-  int numberOfDaysLeft = 5;
+  DateTime now = DateTime.now();
+  int dDay = 0;
+  bool isStart = false;
+  PeriodModel? currentPeriod;
 
   initPrefs() async {
     prefs = await SharedPreferences.getInstance();
+    String? jsonString = prefs.getString('history');
+    List<dynamic> jsonList = jsonDecode(jsonString!);
+    List<PeriodModel> history =
+        jsonList.map((jsonItem) => PeriodModel.fromJson(jsonItem)).toList();
 
     setState(() {
-      period = periodList[prefs.getInt('period')!];
-      startDate = DateTime.parse(prefs.getString('startDate')!);
-      endDate = DateTime.parse(prefs.getString('endDate')!);
-      periodDays = endDate.difference(startDate).inDays;
-      ovulationDay = startDate.add(Duration(days: period - 14));
-      expectedPeriodDate = ovulationDay.add(const Duration(days: 14));
-      numberOfDaysLeft = expectedPeriodDate.difference(DateTime.now()).inDays;
+      currentPeriod = filterByNow(history, DateTime.now());
+      dDay = calculateDaysUntilExpectedStartDate(
+          currentPeriod?.expectedStartDate, now);
     });
+  }
+
+  PeriodModel filterByNow(List<PeriodModel> list, DateTime now) {
+    print('now $now');
+    return list.firstWhere((element) =>
+        now.isBefore(element.expectedStartDate.add(const Duration(days: 10))));
+  }
+
+  int calculateDaysUntilExpectedStartDate(
+      DateTime? expectedStartDate, DateTime now) {
+    if (expectedStartDate != null) {
+      print('expectedStartDate $expectedStartDate');
+      return expectedStartDate.difference(now).inDays;
+    }
+    return 0;
   }
 
   @override
@@ -93,12 +105,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(
                     height: 30,
                   ),
-                  Text(
-                    '$numberOfDaysLeft일 전',
-                    style: const TextStyle(
-                      fontSize: 28,
-                    ),
-                  ),
+                  dDay > 0
+                      ? Text(
+                          '$dDay일 전',
+                          style: const TextStyle(
+                            fontSize: 28,
+                          ),
+                        )
+                      : Text(
+                          '${-dDay}일 지남',
+                          style: const TextStyle(
+                            fontSize: 28,
+                          ),
+                        ),
                   const SizedBox(
                     height: 30,
                   ),
@@ -112,19 +131,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       );
                     },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Text(
-                          '생리시작',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white),
+                    child: GestureDetector(
+                      onTap: () => {},
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            '생리시작',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white),
+                          ),
                         ),
                       ),
                     ),
@@ -141,8 +163,8 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               TableCalendar(
                 locale: 'ko_KR',
-                firstDay: DateTime.utc(2010, 10, 16),
-                lastDay: DateTime.utc(2030, 3, 14),
+                firstDay: DateTime.utc(2024, 1, 1),
+                lastDay: DateTime.utc(2029, 12, 31),
                 focusedDay: DateTime.now(),
                 rowHeight: 100,
                 headerStyle: const HeaderStyle(

@@ -13,7 +13,7 @@ class MenstrualCycle extends StatefulWidget {
 class _MenstrualCycleState extends State<MenstrualCycle> {
   late SharedPreferences prefs;
   final List<int> periodList = List.generate(31, (int index) => index + 20);
-  int selectedPeriod = 0;
+  int selectedPeriodIndex = 0;
 
   Future<void> initPrefs() async {
     prefs = await SharedPreferences.getInstance();
@@ -21,12 +21,12 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
 
     if (period != null) {
       setState(() {
-        selectedPeriod = period;
+        selectedPeriodIndex = periodList.indexOf(period);
       });
     } else {
-      await prefs.setInt('period', 0);
+      await prefs.setInt('period', 28);
       setState(() {
-        selectedPeriod = 0;
+        selectedPeriodIndex = 0;
       });
     }
   }
@@ -66,7 +66,7 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.ideographic,
                     children: [
-                      Text('${periodList[selectedPeriod]}',
+                      Text('${periodList[selectedPeriodIndex]}',
                           style: const TextStyle(
                             fontSize: 30,
                           )),
@@ -87,11 +87,12 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
                         useMagnifier: true,
                         itemExtent: 32.0,
                         scrollController: FixedExtentScrollController(
-                            initialItem: selectedPeriod),
+                            initialItem: selectedPeriodIndex),
                         onSelectedItemChanged: (int selectedItem) async {
-                          await prefs.setInt('period', selectedItem);
+                          await prefs.setInt(
+                              'period', periodList[selectedItem]);
                           setState(() {
-                            selectedPeriod = selectedItem;
+                            selectedPeriodIndex = selectedItem;
                           });
                         },
                         children: List.generate(periodList.length, (int index) {

@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:my_period/models/period_cycle_model.dart';
 
 import 'package:my_period/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,8 +64,7 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
     initEndDatePrefs();
   }
 
-  //todo: 메서드 추출
-  void onStartCalenderTap(Widget child) {
+  void onCalenderTap(Widget child) {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => Container(
@@ -74,17 +77,18 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
     );
   }
 
-  void onEndCalenderTap(Widget child) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) => Container(
-          height: 216,
-          padding: const EdgeInsets.only(top: 6.0),
-          margin:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          color: CupertinoColors.systemBackground.resolveFrom(context),
-          child: SafeArea(top: false, child: child)),
-    );
+  void makeAllPeriodDates() async {
+    int periodCycle = prefs.getInt('period') ?? 28;
+    List<PeriodModel> data = PeriodCycleModel(
+            periodCycle: periodCycle,
+            lastPeriodStartDate: startDate,
+            lastPeriodEndDate: endDate)
+        .makeAllPeriodDates(startDate);
+
+    List<Map<String, dynamic>> jsonData =
+        data.map((item) => item.toJson()).toList();
+
+    await prefs.setString('history', jsonEncode(jsonData));
   }
 
   @override
@@ -130,15 +134,16 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                           ),
                           // todo: 위젯으로 추출
                           GestureDetector(
-                            onTap: () => onStartCalenderTap(
+                            onTap: () => onCalenderTap(
                               CupertinoDatePicker(
                                 initialDateTime: startDate,
                                 mode: CupertinoDatePickerMode.date,
                                 use24hFormat: true,
                                 onDateTimeChanged: (DateTime newTime) async {
                                   await prefs.setString(
-                                      'startDate', newTime.toIso8601String());
-
+                                    'startDate',
+                                    newTime.toIso8601String(),
+                                  );
                                   setState(() {
                                     startDate = newTime;
                                   });
@@ -188,9 +193,9 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                             height: 5,
                           ),
                           GestureDetector(
-                            onTap: () => onEndCalenderTap(
+                            onTap: () => onCalenderTap(
                               CupertinoDatePicker(
-                                initialDateTime: endDate,
+                                initialDateTime: startDate,
                                 minimumDate: startDate,
                                 maximumDate: startDate.add(
                                   const Duration(days: 180),
@@ -199,7 +204,9 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                                 use24hFormat: true,
                                 onDateTimeChanged: (DateTime newTime) async {
                                   await prefs.setString(
-                                      'endDate', newTime.toIso8601String());
+                                    'endDate',
+                                    newTime.toIso8601String(),
+                                  );
                                   setState(() {
                                     endDate = newTime;
                                   });
@@ -245,6 +252,7 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
             ),
             GestureDetector(
               onTap: () {
+                makeAllPeriodDates();
                 Navigator.push(
                     context,
                     MaterialPageRoute(
