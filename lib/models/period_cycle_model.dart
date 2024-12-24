@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 class PeriodModel {
   DateTime expectedStartDate;
   DateTime expectedEndDate;
-  final DateTime? actualStartDate, actualEndDate;
+  DateTime? actualStartDate, actualEndDate;
 
   PeriodModel({
     required this.expectedStartDate,
@@ -12,11 +12,26 @@ class PeriodModel {
     this.actualEndDate,
   });
 
+  PeriodModel copyWith({
+    required DateTime? actualStartDate,
+    required DateTime? actualEndDate,
+  }) {
+    return PeriodModel(
+        expectedStartDate: expectedStartDate,
+        expectedEndDate: expectedEndDate,
+        actualStartDate: actualStartDate,
+        actualEndDate: actualEndDate);
+  }
+
   PeriodModel.fromJson(Map<String, dynamic> json)
       : expectedStartDate = DateTime.parse(json['expectedStartDate']),
         expectedEndDate = DateTime.parse(json['expectedEndDate']),
-        actualStartDate = json['actualStartDate'],
-        actualEndDate = json['actualEndDate'];
+        actualStartDate = json['actualStartDate'] != null
+            ? DateTime.parse(json['actualStartDate'])
+            : null,
+        actualEndDate = json['actualEndDate'] != null
+            ? DateTime.parse(json['actualEndDate'])
+            : null;
 
   Map<String, dynamic> toJson() {
     return {
@@ -36,8 +51,7 @@ class PeriodModel {
 class PeriodCycleModel {
   int periodCycle;
   DateTime lastPeriodStartDate, lastPeriodEndDate;
-  late int periodLength;
-  late List<PeriodModel> allPeriodDates;
+  static late int periodLength;
 
   PeriodCycleModel({
     required this.periodCycle,
@@ -45,7 +59,6 @@ class PeriodCycleModel {
     required this.lastPeriodEndDate,
   }) {
     periodLength = lastPeriodEndDate.difference(lastPeriodStartDate).inDays;
-    allPeriodDates = makeAllPeriodDates(lastPeriodStartDate);
   }
 
   //메서드와 함수의 차이..?
@@ -56,7 +69,7 @@ class PeriodCycleModel {
   }
 
   //예정종료일 계산
-  DateTime getNextPeriodEndDate(DateTime startDate) {
+  static DateTime getNextPeriodEndDate(DateTime startDate) {
     return startDate.add(Duration(days: periodLength));
   }
 
@@ -77,8 +90,28 @@ class PeriodCycleModel {
     return periodDates;
   }
 
-  PeriodModel filterByNow(List<PeriodModel> allPeriodDates, DateTime now) {
+  static PeriodModel filterByNow(
+      List<PeriodModel> allPeriodDates, DateTime now) {
     return allPeriodDates.firstWhere((element) =>
-        element.expectedStartDate.add(const Duration(days: 10)).isBefore(now));
+        now.isBefore(element.expectedStartDate.add(const Duration(days: 10))));
+  }
+
+  //생리실제시작일 기록, 생리실제종료일도 시작일 기준으로 기록
+  //allPeriodDates에서 해당 아이템의 실제시작일과 실제 종료일 기록
+  //예상일과 시작이리 다르다면,
+  //allPeriodDates에서 해당 아이템 인덱스 찾기
+  //해당 시작일 기준으로 2029년도까지 예상일 다시 계산
+  //위의 리스트를 기존 리스트에 덮어쓰기 (아까 찾은 인덱스+1부터)
+
+//??
+  void recordActualStartDate(List<PeriodModel> allPeriodDates,
+      PeriodModel currentPeriod, DateTime now) {
+    allPeriodDates = allPeriodDates.map((el) {
+      if (el == currentPeriod) {
+        el.actualStartDate = now;
+        el.actualEndDate = getNextPeriodEndDate(now);
+      }
+      return el;
+    }).toList();
   }
 }
