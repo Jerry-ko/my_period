@@ -15,6 +15,7 @@ class EditPeriodDate extends StatefulWidget {
 class _EditPeriodDateState extends State<EditPeriodDate> {
   late SharedPreferences prefs;
   List<PeriodModel> allPeriodDates = [];
+  bool isLoading = true;
 
   initPrefs() async {
     prefs = await SharedPreferences.getInstance();
@@ -22,9 +23,11 @@ class _EditPeriodDateState extends State<EditPeriodDate> {
     List<dynamic> jsonList = jsonDecode(jsonString);
     List<PeriodModel> history =
         jsonList.map((jsonItem) => PeriodModel.fromJson(jsonItem)).toList();
+    print('history $history');
 
     setState(() {
       allPeriodDates = history;
+      isLoading = false;
     });
   }
 
@@ -36,6 +39,9 @@ class _EditPeriodDateState extends State<EditPeriodDate> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const CircularProgressIndicator();
+    }
     return Scaffold(
       appBar: AppBar(),
       body: Padding(

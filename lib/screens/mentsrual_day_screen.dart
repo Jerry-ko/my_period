@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:my_period/models/period_cycle_model.dart';
 
 import 'package:my_period/screens/home_screen.dart';
@@ -18,6 +19,7 @@ class MentsrualDayScreen extends StatefulWidget {
 class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
+  DateTime calendarMaximumDate = DateTime.now().add(const Duration(days: 30));
 
   late SharedPreferences prefs;
 
@@ -33,9 +35,10 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
         startDate = dateTimeStartDate;
       });
     } else {
-      await prefs.setString('startDate', DateTime.now().toIso8601String());
+      String date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      await prefs.setString('startDate', date);
       setState(() {
-        startDate = DateTime.now();
+        startDate = DateTime.parse(date);
       });
     }
   }
@@ -50,9 +53,10 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
         endDate = dateTimeEndDate;
       });
     } else {
-      await prefs.setString('endDate', DateTime.now().toIso8601String());
+      String date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      await prefs.setString('endDate', date);
       setState(() {
-        endDate = DateTime.now();
+        endDate = DateTime.parse(date);
       });
     }
   }
@@ -136,15 +140,18 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                             onTap: () => onCalenderTap(
                               CupertinoDatePicker(
                                 initialDateTime: startDate,
+                                maximumDate: calendarMaximumDate,
                                 mode: CupertinoDatePickerMode.date,
                                 use24hFormat: true,
                                 onDateTimeChanged: (DateTime newTime) async {
+                                  String date =
+                                      DateFormat('yyyy-MM-dd').format(newTime);
                                   await prefs.setString(
-                                    'startDate',
-                                    newTime.toIso8601String(),
+                                    'starttDate',
+                                    date,
                                   );
                                   setState(() {
-                                    startDate = newTime;
+                                    startDate = DateTime.parse(date);
                                   });
                                 },
                               ),
@@ -202,12 +209,14 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                                 mode: CupertinoDatePickerMode.date,
                                 use24hFormat: true,
                                 onDateTimeChanged: (DateTime newTime) async {
+                                  String date =
+                                      DateFormat('yyyy-MM-dd').format(newTime);
                                   await prefs.setString(
                                     'endDate',
-                                    newTime.toIso8601String(),
+                                    date,
                                   );
                                   setState(() {
-                                    endDate = newTime;
+                                    endDate = DateTime.parse(date);
                                   });
                                 },
                               ),

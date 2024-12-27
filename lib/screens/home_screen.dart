@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:my_period/models/period_cycle_model.dart';
 import 'package:my_period/screens/edit_period_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,7 +23,8 @@ class _HomeScreenState extends State<HomeScreen> {
   PeriodModel? currentPeriodDate;
   int currentPeriodIndex = 0;
 
-  DateTime now = DateTime.now();
+  DateTime now =
+      DateTime.parse(DateFormat('yyyy-MM-dd').format(DateTime.now()));
   int dDay = 0;
 
   int calculatePeriodDays(PeriodModel periodModel, DateTime now) {
@@ -41,9 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       allPeriodDates =
           jsonList.map((jsonItem) => PeriodModel.fromJson(jsonItem)).toList();
-      selectedRanges = makeSelectedRanges(allPeriodDates);
-      currentPeriodDate =
-          PeriodCycleModel.filterByNow(allPeriodDates, DateTime.now());
+      selectedRanges = makeSelectedRanges(allPeriodDates, now);
+      currentPeriodDate = PeriodCycleModel.filterByNow(allPeriodDates, now);
       currentPeriodIndex = allPeriodDates.indexOf(currentPeriodDate!);
       dDay = calculatePeriodDays(currentPeriodDate!, now);
     });
@@ -53,7 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
       DateTime now) async {
     List<PeriodModel> updatePeriodDates =
         recordActualStartDate(allPeriodDates, currentPeriodIndex, now);
-    print('origin $updatePeriodDates');
 
     DateTime expectedStartDate =
         allPeriodDates[currentPeriodIndex].expectedStartDate;
@@ -76,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await prefs.setString('history', jsonEncode(jsonList));
 
     List<Map<String, DateTime?>> updateSelectedRanges =
-        makeSelectedRanges(updatePeriodDates);
+        makeSelectedRanges(updatePeriodDates, now);
 
     setState(() {
       allPeriodDates = updatePeriodDates;
@@ -88,16 +88,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Map<String, DateTime?>> makeSelectedRanges(
-      List<PeriodModel> allPeriodDates) {
+      List<PeriodModel> allPeriodDates, DateTime standardDate) {
     List<Map<String, DateTime?>> selectedRanges = allPeriodDates.map((period) {
       return {
         'start': period.actualStartDate ??
-            (DateTime.now().isBefore(
+            (standardDate.isBefore(
                     period.expectedStartDate.add(const Duration(days: 10)))
                 ? period.expectedStartDate
                 : null),
         'end': period.actualEndDate ??
-            (DateTime.now().isBefore(
+            (standardDate.isBefore(
                     period.expectedStartDate.add(const Duration(days: 10)))
                 ? period.expectedEndDate
                 : null),
@@ -203,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     offstage: !(currentPeriodDate?.actualStartDate == null &&
                         dDay < 0),
                     child: Text(
-                      '$dDay일 지남',
+                      '${-dDay}일 지남',
                       style: const TextStyle(
                         fontSize: 28,
                       ),
