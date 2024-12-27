@@ -13,32 +13,40 @@ class MenstrualCycle extends StatefulWidget {
 class _MenstrualCycleState extends State<MenstrualCycle> {
   late SharedPreferences prefs;
   final List<int> periodList = List.generate(31, (int index) => index + 20);
-  int selectedPeriodIndex = 0;
+  late FixedExtentScrollController _scrollController;
+  int selectedPeriodIndex = 8;
+  bool isLoading = true;
 
-  Future<void> initPrefs() async {
+  initPrefs() async {
     prefs = await SharedPreferences.getInstance();
     final int? period = prefs.getInt('period');
 
     if (period != null) {
+      int periodIndex = periodList.indexOf(period);
       setState(() {
-        selectedPeriodIndex = periodList.indexOf(period);
+        _scrollController =
+            FixedExtentScrollController(initialItem: periodIndex);
+        selectedPeriodIndex = periodIndex;
+        isLoading = false;
       });
-    } else {
-      await prefs.setInt('period', 28);
-      setState(() {
-        selectedPeriodIndex = 0;
-      });
+      return;
     }
+    await prefs.setInt('period', 28);
   }
 
   @override
   void initState() {
     super.initState();
+    _scrollController =
+        FixedExtentScrollController(initialItem: selectedPeriodIndex);
     initPrefs();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const CircularProgressIndicator();
+    }
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(40),
@@ -86,8 +94,7 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
                         squeeze: 1.2,
                         useMagnifier: true,
                         itemExtent: 32.0,
-                        scrollController: FixedExtentScrollController(
-                            initialItem: selectedPeriodIndex),
+                        scrollController: _scrollController,
                         onSelectedItemChanged: (int selectedItem) async {
                           await prefs.setInt(
                               'period', periodList[selectedItem]);

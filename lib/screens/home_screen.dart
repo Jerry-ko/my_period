@@ -25,50 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime now = DateTime.now();
   int dDay = 0;
 
-  initPrefs() async {
-    prefs = await SharedPreferences.getInstance();
-    String? jsonString = prefs.getString('history');
-    List<dynamic> jsonList = jsonDecode(jsonString!);
-    allPeriodDates =
-        jsonList.map((jsonItem) => PeriodModel.fromJson(jsonItem)).toList();
-    print('init $allPeriodDates');
-    selectedRanges = allPeriodDates.map((period) {
-      return {
-        'start': period.actualStartDate ??
-            (DateTime.now().isBefore(
-                    period.expectedStartDate.add(const Duration(days: 10)))
-                ? period.expectedStartDate
-                : null),
-        'end': period.actualEndDate ??
-            (DateTime.now().isBefore(
-                    period.expectedStartDate.add(const Duration(days: 10)))
-                ? period.expectedEndDate
-                : null),
-      };
-    }).toList();
-    currentPeriodDate =
-        PeriodCycleModel.filterByNow(allPeriodDates, DateTime.now());
-    currentPeriodIndex = allPeriodDates.indexOf(currentPeriodDate!);
-    setState(() {
-      dDay = calculatePeriodDays(currentPeriodDate!, now);
-    });
-  }
-
-  // 캘린더
-  // 오늘이 생리예정일+10일까지는 생리예정일 기록, 이후에는 실제기록일 null로 설정 후 표시
-  // 예정기록일과 실제기록일이 있을 시 실제기록일 기준
-  // 시작하기 누르면 해당일 기준 종료일까지 세팅해서 들어감
-
-  // 편집 시에는 시작일이 있고 종료일이 없을 시 종료일에 시작일 넣기
-  // 편집 시에 모두 없을 경우에는 null 처리 후 selectedRanges 범위에서 삭제
-
-  //생리예정일 12월 15일
-  //12월 25일까지는 예정일 표시 (실제기록일 없을 시)
-  //실제기록일 있을 시 실제기록일 표시
-  //날짜가 예정일+10이 지나면 실제 기록일 표시, 없으면 null로 표시
-  //day가 예정일+10일 이전이면 예정일, 혹 실제기록일 있음 실제기록인
-  //day가 예정일+10이후이면 생릭실제기록일 표시
-
   int calculatePeriodDays(PeriodModel periodModel, DateTime now) {
     if (periodModel.actualStartDate == null) {
       return periodModel.expectedStartDate.difference(now).inDays;
@@ -77,7 +33,23 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void onStartTab(List<PeriodModel> allPeriodDates, int currentPeriodIndex,
+  initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    String? jsonString = prefs.getString('history');
+    List<dynamic> jsonList = jsonDecode(jsonString!);
+
+    setState(() {
+      allPeriodDates =
+          jsonList.map((jsonItem) => PeriodModel.fromJson(jsonItem)).toList();
+      selectedRanges = makeSelectedRanges(allPeriodDates);
+      currentPeriodDate =
+          PeriodCycleModel.filterByNow(allPeriodDates, DateTime.now());
+      currentPeriodIndex = allPeriodDates.indexOf(currentPeriodDate!);
+      dDay = calculatePeriodDays(currentPeriodDate!, now);
+    });
+  }
+
+  onStartTab(List<PeriodModel> allPeriodDates, int currentPeriodIndex,
       DateTime now) async {
     List<PeriodModel> updatePeriodDates =
         recordActualStartDate(allPeriodDates, currentPeriodIndex, now);
@@ -85,32 +57,35 @@ class _HomeScreenState extends State<HomeScreen> {
     DateTime expectedStartDate =
         allPeriodDates[currentPeriodIndex].expectedStartDate;
 
+    //예정일과 시작일 다를 경우
+    //PeriodCycleModel 새로 생성 후 기존 데이터에 삽입
+
     if (expectedStartDate != now) {
       int periodCycle = prefs.getInt('period') ?? 28;
-      List<PeriodModel> recalculatedPeriods = PeriodCycleModel(
-              periodCycle: periodCycle,
-              lastPeriodStartDate: now,
-              lastPeriodEndDate: PeriodCycleModel.getNextPeriodEndDate(now))
-          .makeAllPeriodDates(now);
-      // print('다시 게산: $calculatePeriodDates');
+      List<PeriodModel> recalculatedPeriods =
+          updatePeriodCycleModel(periodCycle, now);
       updatePeriodDates.insertAll(currentPeriodIndex + 1, recalculatedPeriods);
-      // print('data 재조립:  $periodDateWrittenActualStartDate');
-      List<Map<String, dynamic>> jsonList =
-          updatePeriodDates.map((item) => item.toJson()).toList();
-      await prefs.setString('history', jsonEncode(jsonList));
-    } else {
-      List<Map<String, dynamic>> jsonList =
-          updatePeriodDates.map((item) => item.toJson()).toList();
-      await prefs.setString('history', jsonEncode(jsonList));
     }
 
-    String? jsonString = prefs.getString('history')!;
-    List<dynamic> jsonList = jsonDecode(jsonString);
-    List<PeriodModel> updatedAllPeriodDates =
-        jsonList.map((jsonItem) => PeriodModel.fromJson(jsonItem)).toList();
+    List<Map<String, dynamic>> jsonList =
+        updatePeriodDates.map((item) => item.toJson()).toList();
+    await prefs.setString('history', jsonEncode(jsonList));
 
-    List<Map<String, DateTime?>> updatedSelectedRanges =
-        allPeriodDates.map((period) {
+    List<Map<String, DateTime?>> updateSelectedRanges =
+        makeSelectedRanges(updatePeriodDates);
+
+    setState(() {
+      allPeriodDates = updatePeriodDates;
+      selectedRanges = updateSelectedRanges;
+      currentPeriodDate = PeriodCycleModel.filterByNow(updatePeriodDates, now);
+      currentPeriodIndex = updatePeriodDates.indexOf(currentPeriodDate!);
+      dDay = calculatePeriodDays(currentPeriodDate!, now);
+    });
+  }
+
+  List<Map<String, DateTime?>> makeSelectedRanges(
+      List<PeriodModel> allPeriodDates) {
+    List<Map<String, DateTime?>> selectedRanges = allPeriodDates.map((period) {
       return {
         'start': period.actualStartDate ??
             (DateTime.now().isBefore(
@@ -125,15 +100,15 @@ class _HomeScreenState extends State<HomeScreen> {
       };
     }).toList();
 
-    setState(() {
-      allPeriodDates = updatedAllPeriodDates;
-      selectedRanges = updatedSelectedRanges;
-      currentPeriodDate = PeriodCycleModel.filterByNow(allPeriodDates, now);
-      currentPeriodIndex = allPeriodDates.indexOf(currentPeriodDate!);
-      dDay = calculatePeriodDays(currentPeriodDate!, now);
-    });
+    return selectedRanges;
+  }
 
-    print('set all: $allPeriodDates');
+  List<PeriodModel> updatePeriodCycleModel(int periodCycle, DateTime now) {
+    return PeriodCycleModel(
+            periodCycle: periodCycle,
+            lastPeriodStartDate: now,
+            lastPeriodEndDate: PeriodCycleModel.getNextPeriodEndDate(now))
+        .makeAllPeriodDates(now);
   }
 
   List<PeriodModel> recordActualStartDate(
@@ -281,7 +256,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         Visibility(
                           visible: currentPeriodDate?.actualStartDate != null,
                           child: GestureDetector(
-                            onTap: () => {},
+                            onTap: () => {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const EditPeriodDate(),
+                                  fullscreenDialog: true,
+                                ),
+                              )
+                            },
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Theme.of(context).primaryColor,
@@ -375,6 +358,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+
+  // 캘린더
+  // 오늘이 생리예정일+10일까지는 생리예정일 기록, 이후에는 실제기록일 null로 설정 후 표시
+  // 예정기록일과 실제기록일이 있을 시 실제기록일 기준
+  // 시작하기 누르면 해당일 기준 종료일까지 세팅해서 들어감
+
+  // 편집 시에는 시작일이 있고 종료일이 없을 시 종료일에 시작일 넣기
+  // 편집 시에 모두 없을 경우에는 null 처리 후 selectedRanges 범위에서 삭제
+
+  //생리예정일 12월 15일
+  //12월 25일까지는 예정일 표시 (실제기록일 없을 시)
+  //실제기록일 있을 시 실제기록일 표시
+  //날짜가 예정일+10이 지나면 실제 기록일 표시, 없으면 null로 표시
+  //day가 예정일+10일 이전이면 예정일, 혹 실제기록일 있음 실제기록인
+  //day가 예정일+10이후이면 생릭실제기록일 표시
 
 
   // 시작하기 버튼 누르면 이벤트
