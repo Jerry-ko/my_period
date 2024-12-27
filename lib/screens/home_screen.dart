@@ -53,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
       DateTime now) async {
     List<PeriodModel> updatePeriodDates =
         recordActualStartDate(allPeriodDates, currentPeriodIndex, now);
+    print('origin $updatePeriodDates');
 
     DateTime expectedStartDate =
         allPeriodDates[currentPeriodIndex].expectedStartDate;
@@ -64,7 +65,10 @@ class _HomeScreenState extends State<HomeScreen> {
       int periodCycle = prefs.getInt('period') ?? 28;
       List<PeriodModel> recalculatedPeriods =
           updatePeriodCycleModel(periodCycle, now);
-      updatePeriodDates.insertAll(currentPeriodIndex + 1, recalculatedPeriods);
+      updatePeriodDates.removeRange(
+          currentPeriodIndex + 1, updatePeriodDates.length);
+      updatePeriodDates.insertAll(
+          updatePeriodDates.length, recalculatedPeriods);
     }
 
     List<Map<String, dynamic>> jsonList =
