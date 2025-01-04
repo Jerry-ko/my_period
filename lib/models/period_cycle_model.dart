@@ -1,13 +1,11 @@
 import 'package:flutter/cupertino.dart';
 
 class PeriodModel {
-  DateTime expectedStartDate;
-  DateTime expectedEndDate;
-  DateTime? actualStartDate, actualEndDate;
+  DateTime? expectedStartDate, expectedEndDate, actualStartDate, actualEndDate;
 
   PeriodModel({
-    required this.expectedStartDate,
-    required this.expectedEndDate,
+    this.expectedStartDate,
+    this.expectedEndDate,
     this.actualStartDate,
     this.actualEndDate,
   });
@@ -35,8 +33,8 @@ class PeriodModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'expectedStartDate': expectedStartDate.toIso8601String(),
-      'expectedEndDate': expectedEndDate.toIso8601String(),
+      'expectedStartDate': expectedStartDate?.toIso8601String(),
+      'expectedEndDate': expectedEndDate?.toIso8601String(),
       'actualStartDate': actualStartDate?.toIso8601String(),
       'actualEndDate': actualEndDate?.toIso8601String(),
     };
@@ -93,7 +91,7 @@ class PeriodCycleModel {
   static PeriodModel filterByNow(
       List<PeriodModel> allPeriodDates, DateTime now) {
     return allPeriodDates.firstWhere((element) =>
-        now.isBefore(element.expectedStartDate.add(const Duration(days: 10))));
+        now.isBefore(element.expectedStartDate!.add(const Duration(days: 10))));
   }
 
   //생리실제시작일 기록, 생리실제종료일도 시작일 기준으로 기록

@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int calculatePeriodDays(PeriodModel periodModel, DateTime now) {
     if (periodModel.actualStartDate == null) {
-      return periodModel.expectedStartDate.difference(now).inDays;
+      return periodModel.expectedStartDate!.difference(now).inDays;
     } else {
       return periodModel.actualStartDate!.difference(now).inDays + 1;
     }
@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
         recordActualStartDate(allPeriodDates, currentPeriodIndex, now);
 
     DateTime expectedStartDate =
-        allPeriodDates[currentPeriodIndex].expectedStartDate;
+        allPeriodDates[currentPeriodIndex].expectedStartDate!;
 
     //예정일과 시작일 다를 경우
     //PeriodCycleModel 새로 생성 후 기존 데이터에 삽입
@@ -93,12 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
       return {
         'start': period.actualStartDate ??
             (standardDate.isBefore(
-                    period.expectedStartDate.add(const Duration(days: 10)))
+                    period.expectedStartDate!.add(const Duration(days: 10)))
                 ? period.expectedStartDate
                 : null),
         'end': period.actualEndDate ??
             (standardDate.isBefore(
-                    period.expectedStartDate.add(const Duration(days: 10)))
+                    period.expectedStartDate!.add(const Duration(days: 10)))
                 ? period.expectedEndDate
                 : null),
       };
@@ -260,14 +260,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         Visibility(
                           visible: currentPeriodDate?.actualStartDate != null,
                           child: GestureDetector(
-                            onTap: () => {
+                            onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const EditPeriodDate(),
                                   fullscreenDialog: true,
                                 ),
-                              )
+                              );
                             },
                             child: Container(
                               decoration: BoxDecoration(
@@ -338,19 +338,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   titleCentered: true,
                 ),
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Text(
-                    '생리기간 편집',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const EditPeriodDate(),
+                          fullscreenDialog: true));
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Text(
+                      '생리기간 편집',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),

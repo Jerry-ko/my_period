@@ -98,6 +98,7 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(40),
         child: Column(
@@ -109,7 +110,7 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
                   Column(
                     children: [
                       const SizedBox(
-                        height: 150,
+                        height: 35,
                       ),
                       const Align(
                         child: Text(
