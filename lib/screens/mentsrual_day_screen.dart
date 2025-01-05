@@ -99,194 +99,196 @@ class _MentsrualDayScreenState extends State<MentsrualDayScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    children: [
-                      const SizedBox(
-                        height: 35,
-                      ),
-                      const Align(
-                        child: Text(
-                          '최근 생리일을 입력해주세요',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w600,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(40),
+          child: Column(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      children: [
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Align(
+                          child: Text(
+                            '최근 생리일을 입력해주세요',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 50,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '시작일',
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          // todo: 위젯으로 추출
-                          GestureDetector(
-                            onTap: () => onCalenderTap(
-                              CupertinoDatePicker(
-                                initialDateTime: startDate,
-                                maximumDate: calendarMaximumDate,
-                                mode: CupertinoDatePickerMode.date,
-                                use24hFormat: true,
-                                onDateTimeChanged: (DateTime newTime) async {
-                                  String date =
-                                      DateFormat('yyyy-MM-dd').format(newTime);
-                                  await prefs.setString(
-                                    'starttDate',
-                                    date,
-                                  );
-                                  setState(() {
-                                    startDate = DateTime.parse(date);
-                                  });
-                                },
+                        const SizedBox(
+                          height: 50,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '시작일',
+                              style: TextStyle(
+                                fontSize: 20,
                               ),
                             ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(20),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            // todo: 위젯으로 추출
+                            GestureDetector(
+                              onTap: () => onCalenderTap(
+                                CupertinoDatePicker(
+                                  initialDateTime: startDate,
+                                  maximumDate: calendarMaximumDate,
+                                  mode: CupertinoDatePickerMode.date,
+                                  use24hFormat: true,
+                                  onDateTimeChanged: (DateTime newTime) async {
+                                    String date = DateFormat('yyyy-MM-dd')
+                                        .format(newTime);
+                                    await prefs.setString(
+                                      'starttDate',
+                                      date,
+                                    );
+                                    setState(() {
+                                      startDate = DateTime.parse(date);
+                                    });
+                                  },
+                                ),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Icon(Icons.calendar_month),
-                                    Text(
-                                      '${startDate.year}년 ${startDate.month}월 ${startDate.day}일',
-                                      style: const TextStyle(
-                                        fontSize: 18,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Icon(Icons.calendar_month),
+                                      Text(
+                                        '${startDate.year}년 ${startDate.month}월 ${startDate.day}일',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      '변경',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.orange.shade900,
+                                      Text(
+                                        '변경',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.orange.shade900,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 40,
-                          ),
-                          const Text(
-                            '종료일',
-                            style: TextStyle(
-                              fontSize: 20,
+                            const SizedBox(
+                              height: 40,
                             ),
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          GestureDetector(
-                            onTap: () => onCalenderTap(
-                              CupertinoDatePicker(
-                                initialDateTime: startDate,
-                                minimumDate: startDate,
-                                maximumDate: startDate.add(
-                                  const Duration(days: 180),
-                                ),
-                                mode: CupertinoDatePickerMode.date,
-                                use24hFormat: true,
-                                onDateTimeChanged: (DateTime newTime) async {
-                                  String date =
-                                      DateFormat('yyyy-MM-dd').format(newTime);
-                                  await prefs.setString(
-                                    'endDate',
-                                    date,
-                                  );
-                                  setState(() {
-                                    endDate = DateTime.parse(date);
-                                  });
-                                },
+                            const Text(
+                              '종료일',
+                              style: TextStyle(
+                                fontSize: 20,
                               ),
                             ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Icon(Icons.calendar_month),
-                                    Text(
-                                      '${endDate.year}년 ${endDate.month}월 ${endDate.day}일',
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                    Text(
-                                      '변경',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.orange.shade900,
-                                      ),
-                                    ),
-                                  ],
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            GestureDetector(
+                              onTap: () => onCalenderTap(
+                                CupertinoDatePicker(
+                                  initialDateTime: startDate,
+                                  minimumDate: startDate,
+                                  maximumDate: startDate.add(
+                                    const Duration(days: 180),
+                                  ),
+                                  mode: CupertinoDatePickerMode.date,
+                                  use24hFormat: true,
+                                  onDateTimeChanged: (DateTime newTime) async {
+                                    String date = DateFormat('yyyy-MM-dd')
+                                        .format(newTime);
+                                    await prefs.setString(
+                                      'endDate',
+                                      date,
+                                    );
+                                    setState(() {
+                                      endDate = DateTime.parse(date);
+                                    });
+                                  },
                                 ),
                               ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Icon(Icons.calendar_month),
+                                      Text(
+                                        '${endDate.year}년 ${endDate.month}월 ${endDate.day}일',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      Text(
+                                        '변경',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.orange.shade900,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                makeAllPeriodDates();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const HomeScreen()));
-              },
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(20),
+                          ],
+                        ),
+                      ],
+                    )
+                  ],
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.all(15),
-                  child: Text(
-                    '설정 완료',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+              ),
+              GestureDetector(
+                onTap: () {
+                  makeAllPeriodDates();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HomeScreen()));
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(15),
+                    child: Text(
+                      '설정 완료',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -165,109 +165,111 @@ class _EditPeriodDateState extends State<EditPeriodDate> {
     }
     return Scaffold(
       appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Column(
-          children: [
-            Expanded(
-              child: TableCalendar(
-                focusedDay: DateTime.now(),
-                firstDay: DateTime.utc(2024, 1, 1),
-                lastDay: DateTime.utc(2029, 12, 31),
-                locale: 'ko',
-                headerStyle: const HeaderStyle(
-                  titleCentered: true,
-                  formatButtonVisible: false,
-                ),
-                calendarStyle: const CalendarStyle(
-                  isTodayHighlighted: false,
-                ),
-                rangeSelectionMode: RangeSelectionMode.toggledOn,
-                rowHeight: 100,
-                onDaySelected: (selectedDay, focusedDay) {
-                  DateTime modifiedSelectedDay = DateTime.parse(
-                      DateFormat('yyyy-MM-dd').format(selectedDay));
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Column(
+            children: [
+              Expanded(
+                child: TableCalendar(
+                  focusedDay: DateTime.now(),
+                  firstDay: DateTime.utc(2024, 1, 1),
+                  lastDay: DateTime.utc(2029, 12, 31),
+                  locale: 'ko',
+                  headerStyle: const HeaderStyle(
+                    titleCentered: true,
+                    formatButtonVisible: false,
+                  ),
+                  calendarStyle: const CalendarStyle(
+                    isTodayHighlighted: false,
+                  ),
+                  rangeSelectionMode: RangeSelectionMode.toggledOn,
+                  rowHeight: 90,
+                  onDaySelected: (selectedDay, focusedDay) {
+                    DateTime modifiedSelectedDay = DateTime.parse(
+                        DateFormat('yyyy-MM-dd').format(selectedDay));
 
-                  List<PeriodModel> updatedAllPeriodDates =
-                      checkSelectedDay(allPeriodDates, modifiedSelectedDay);
+                    List<PeriodModel> updatedAllPeriodDates =
+                        checkSelectedDay(allPeriodDates, modifiedSelectedDay);
 
-                  setState(() {
-                    allPeriodDates = updatedAllPeriodDates;
-                  });
-                },
-                calendarBuilders: CalendarBuilders(
-                  defaultBuilder: (context, day, focusedDay) {
-                    for (var period in allPeriodDates) {
-                      if (period.actualStartDate != null &&
-                          period.actualStartDate != null &&
-                          day.isAfter(period.actualStartDate!) &&
-                          day.isBefore(period.actualEndDate!
-                              .add(const Duration(days: 1)))) {
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(day.day.toString()),
-                            const SizedBox(
-                              height: 4,
-                            ),
-                            const SizedBox(
-                              width: 35,
-                              height: 35,
-                              child: Icon(Icons.circle_rounded,
-                                  color: Colors.amber),
-                            ),
-                          ],
-                        );
-                      }
-                    }
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(day.day.toString()),
-                        const SizedBox(
-                          height: 4,
-                        ),
-                        const SizedBox(
-                          width: 35,
-                          height: 35,
-                          child:
-                              Icon(Icons.circle_outlined, color: Colors.amber),
-                        ),
-                      ],
-                    );
+                    setState(() {
+                      allPeriodDates = updatedAllPeriodDates;
+                    });
                   },
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                saveAllPeriodDates(allPeriodDates);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const HomeScreen()));
-              },
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 80),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    '저장',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                  calendarBuilders: CalendarBuilders(
+                    defaultBuilder: (context, day, focusedDay) {
+                      for (var period in allPeriodDates) {
+                        if (period.actualStartDate != null &&
+                            period.actualStartDate != null &&
+                            day.isAfter(period.actualStartDate!) &&
+                            day.isBefore(period.actualEndDate!
+                                .add(const Duration(days: 1)))) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(day.day.toString()),
+                              const SizedBox(
+                                height: 4,
+                              ),
+                              const SizedBox(
+                                width: 35,
+                                height: 35,
+                                child: Icon(Icons.circle_rounded,
+                                    color: Colors.amber),
+                              ),
+                            ],
+                          );
+                        }
+                      }
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(day.day.toString()),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          const SizedBox(
+                            width: 35,
+                            height: 35,
+                            child: Icon(Icons.circle_outlined,
+                                color: Colors.amber),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
-            )
-          ],
+              GestureDetector(
+                onTap: () {
+                  saveAllPeriodDates(allPeriodDates);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HomeScreen()));
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 80),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      '저장',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

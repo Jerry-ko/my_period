@@ -25,11 +25,11 @@ class _AppState extends State<App> {
     prefs = await SharedPreferences.getInstance();
     final int? period = prefs.getInt('period');
 
-    if (period != null) {
-      setState(() {
-        isSetUp = true;
-      });
-    }
+    // if (period != null) {
+    //   setState(() {
+    //     isSetUp = true;
+    //   });
+    // }
   }
 
   @override

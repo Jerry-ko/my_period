@@ -162,137 +162,140 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: [
-        Center(
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 300,
-              ),
-              Column(
-                children: [
-                  const Text(
-                    '생리예정일',
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Offstage(
-                    offstage: !(currentPeriodDate?.actualStartDate != null),
-                    child: Text(
-                      '$dDay일째',
-                      style: const TextStyle(
-                        fontSize: 28,
-                      ),
-                    ),
-                  ),
-                  Offstage(
-                    offstage: !(currentPeriodDate?.actualStartDate == null &&
-                        dDay > 0),
-                    child: Text(
-                      '$dDay일 전',
-                      style: const TextStyle(
-                        fontSize: 28,
-                      ),
-                    ),
-                  ),
-                  Offstage(
-                    offstage: !(currentPeriodDate?.actualStartDate == null &&
-                        dDay < 0),
-                    child: Text(
-                      '${-dDay}일 지남',
-                      style: const TextStyle(
-                        fontSize: 28,
-                      ),
-                    ),
-                  ),
-                  Offstage(
-                    offstage: !(currentPeriodDate?.actualStartDate == null &&
-                        dDay == 0),
-                    child: const Text(
-                      '예정일',
+        SafeArea(
+          child: Center(
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 230,
+                ),
+                Column(
+                  children: [
+                    const Text(
+                      '생리예정일',
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const EditPeriodDate(),
-                          fullscreenDialog: true,
-                        ),
-                      );
-                    },
-                    child: Column(
-                      children: [
-                        Visibility(
-                          visible: currentPeriodDate?.actualStartDate == null,
-                          child: GestureDetector(
-                            onTap: () => onStartTab(
-                                allPeriodDates, currentPeriodIndex, now),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text(
-                                  '생리시작',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Visibility(
-                          visible: currentPeriodDate?.actualStartDate != null,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const EditPeriodDate(),
-                                  fullscreenDialog: true,
-                                ),
-                              );
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text(
-                                  '생리기간 편집',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                    const SizedBox(
+                      height: 30,
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    Offstage(
+                      offstage: !(currentPeriodDate?.actualStartDate != null),
+                      child: Text(
+                        '$dDay일째',
+                        style: const TextStyle(
+                          fontSize: 28,
+                        ),
+                      ),
+                    ),
+                    Offstage(
+                      offstage: !(currentPeriodDate?.actualStartDate == null &&
+                          dDay > 0),
+                      child: Text(
+                        '$dDay일 전',
+                        style: const TextStyle(
+                          fontSize: 28,
+                        ),
+                      ),
+                    ),
+                    Offstage(
+                      offstage: !(currentPeriodDate?.actualStartDate == null &&
+                          dDay < 0),
+                      child: Text(
+                        '${-dDay}일 지남',
+                        style: const TextStyle(
+                          fontSize: 28,
+                        ),
+                      ),
+                    ),
+                    Offstage(
+                      offstage: !(currentPeriodDate?.actualStartDate == null &&
+                          dDay == 0),
+                      child: const Text(
+                        '예정일',
+                        style: TextStyle(
+                          fontSize: 28,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const EditPeriodDate(),
+                            fullscreenDialog: true,
+                          ),
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          Visibility(
+                            visible: currentPeriodDate?.actualStartDate == null,
+                            child: GestureDetector(
+                              onTap: () => onStartTab(
+                                  allPeriodDates, currentPeriodIndex, now),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(
+                                    '생리시작',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Visibility(
+                            visible: currentPeriodDate?.actualStartDate != null,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const EditPeriodDate(),
+                                    fullscreenDialog: true,
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(
+                                    '생리기간 편집',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
         Padding(

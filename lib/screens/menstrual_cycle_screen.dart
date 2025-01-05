@@ -48,112 +48,115 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
       return const CircularProgressIndicator();
     }
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    height: 150,
-                  ),
-                  const Text(
-                    '평균 월경주기를 입력해주세요',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w600,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(40),
+          child: Column(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      height: 80,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 70,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.ideographic,
-                    children: [
-                      Text('${periodList[selectedPeriodIndex]}',
-                          style: const TextStyle(
-                            fontSize: 30,
-                          )),
-                      const Text('일',
-                          style: TextStyle(
-                            fontSize: 30,
-                          )),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  SizedBox(
-                    height: 200,
-                    child: CupertinoPicker(
-                        magnification: 1.22,
-                        squeeze: 1.2,
-                        useMagnifier: true,
-                        itemExtent: 32.0,
-                        scrollController: _scrollController,
-                        onSelectedItemChanged: (int selectedItem) async {
-                          await prefs.setInt(
-                              'period', periodList[selectedItem]);
-                          setState(() {
-                            selectedPeriodIndex = selectedItem;
-                          });
-                        },
-                        children: List.generate(periodList.length, (int index) {
-                          return Text('${periodList[index]}');
-                        })),
-                  ),
-                  const SizedBox(
-                    height: 70,
-                  ),
-                  const Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '평균 월경주기를 잘 모르겠다면,',
-                          ),
-                          Text(
-                            '28일을 선택해주세요',
-                          ),
-                        ],
+                    const Text(
+                      '평균 월경주기를 입력해주세요',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
                       ),
-                    ],
+                    ),
+                    const SizedBox(
+                      height: 70,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.ideographic,
+                      children: [
+                        Text('${periodList[selectedPeriodIndex]}',
+                            style: const TextStyle(
+                              fontSize: 30,
+                            )),
+                        const Text('일',
+                            style: TextStyle(
+                              fontSize: 30,
+                            )),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    SizedBox(
+                      height: 200,
+                      child: CupertinoPicker(
+                          magnification: 1.22,
+                          squeeze: 1.2,
+                          useMagnifier: true,
+                          itemExtent: 32.0,
+                          scrollController: _scrollController,
+                          onSelectedItemChanged: (int selectedItem) async {
+                            await prefs.setInt(
+                                'period', periodList[selectedItem]);
+                            setState(() {
+                              selectedPeriodIndex = selectedItem;
+                            });
+                          },
+                          children:
+                              List.generate(periodList.length, (int index) {
+                            return Text('${periodList[index]}');
+                          })),
+                    ),
+                    const SizedBox(
+                      height: 70,
+                    ),
+                    const Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '평균 월경주기를 잘 모르겠다면,',
+                            ),
+                            Text(
+                              '28일을 선택해주세요',
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MentsrualDayScreen(),
                   ),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MentsrualDayScreen(),
                 ),
-              ),
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(15),
-                  child: Text(
-                    '다음',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                child: Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(15),
+                    child: Text(
+                      '다음',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
