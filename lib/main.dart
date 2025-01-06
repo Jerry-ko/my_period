@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:my_period/screens/home_screen.dart';
@@ -6,8 +7,14 @@ import 'package:my_period/screens/menstrual_cycle_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  initializeDateFormatting().then((_) => runApp(const App()));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+  runApp(const App());
 }
 
 class App extends StatefulWidget {
@@ -25,11 +32,11 @@ class _AppState extends State<App> {
     prefs = await SharedPreferences.getInstance();
     final int? period = prefs.getInt('period');
 
-    // if (period != null) {
-    //   setState(() {
-    //     isSetUp = true;
-    //   });
-    // }
+    if (period != null) {
+      setState(() {
+        isSetUp = true;
+      });
+    }
   }
 
   @override
