@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   initPrefs() async {
     prefs = await SharedPreferences.getInstance();
     String? jsonString = prefs.getString('history');
-    List<dynamic> jsonList = jsonDecode(jsonString!);
+    List<dynamic> jsonList = jsonString != null ? jsonDecode(jsonString) : [];
 
     setState(() {
       allPeriodDates =

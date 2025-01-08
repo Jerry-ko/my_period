@@ -32,11 +32,11 @@ class _AppState extends State<App> {
     prefs = await SharedPreferences.getInstance();
     final int? period = prefs.getInt('period');
 
-    if (period != null) {
-      setState(() {
-        isSetUp = true;
-      });
-    }
+    // if (period != null) {
+    //   setState(() {
+    //     isSetUp = true;
+    //   });
+    // }
   }
 
   @override
@@ -60,7 +60,7 @@ class _AppState extends State<App> {
       locale: const Locale('ko'),
       theme: ThemeData(
           primaryColor: const Color(0xFF99C2C2),
-          secondaryHeaderColor: const Color(0xFF222B2B),
+          secondaryHeaderColor: const Color.fromARGB(255, 28, 153, 153),
           fontFamily: GoogleFonts.gowunDodum().fontFamily),
       home: isSetUp ? const HomeScreen() : const MenstrualCycle(),
     );

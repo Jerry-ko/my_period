@@ -90,6 +90,8 @@ class PeriodCycleModel {
 
   static PeriodModel filterByNow(
       List<PeriodModel> allPeriodDates, DateTime now) {
+    print('allPeriodDates, $allPeriodDates');
+    print('now $now');
     return allPeriodDates.firstWhere((element) =>
         now.isBefore(element.expectedStartDate!.add(const Duration(days: 10))));
   }
