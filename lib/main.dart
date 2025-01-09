@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:my_period/models/period_cycle_model.dart';
 import 'package:my_period/screens/home_screen.dart';
 import 'package:my_period/screens/menstrual_cycle_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -31,12 +34,14 @@ class _AppState extends State<App> {
   initPrefs() async {
     prefs = await SharedPreferences.getInstance();
     final int? period = prefs.getInt('period');
+    String? jsonString = prefs.getString('history');
+    List<dynamic> jsonList = jsonString != null ? jsonDecode(jsonString) : [];
 
-    // if (period != null) {
-    //   setState(() {
-    //     isSetUp = true;
-    //   });
-    // }
+    if (period != null && jsonList.isNotEmpty) {
+      setState(() {
+        isSetUp = true;
+      });
+    }
   }
 
   @override
@@ -48,6 +53,7 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -59,9 +65,12 @@ class _AppState extends State<App> {
       ],
       locale: const Locale('ko'),
       theme: ThemeData(
-          primaryColor: const Color(0xFF99C2C2),
-          secondaryHeaderColor: const Color.fromARGB(255, 28, 153, 153),
-          fontFamily: GoogleFonts.gowunDodum().fontFamily),
+        primaryColor: const Color(0xFF99C2C2),
+        secondaryHeaderColor: const Color(
+          0xFF222B2B,
+        ),
+        fontFamily: GoogleFonts.gowunDodum().fontFamily,
+      ),
       home: isSetUp ? const HomeScreen() : const MenstrualCycle(),
     );
   }

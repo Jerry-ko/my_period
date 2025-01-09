@@ -166,12 +166,12 @@ class _EditPeriodDateState extends State<EditPeriodDate> {
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Column(
-            children: [
-              Expanded(
-                child: TableCalendar(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Column(
+              children: [
+                TableCalendar(
                   focusedDay: DateTime.now(),
                   firstDay: DateTime.utc(2024, 1, 1),
                   lastDay: DateTime.utc(2029, 12, 31),
@@ -239,36 +239,39 @@ class _EditPeriodDateState extends State<EditPeriodDate> {
                     },
                   ),
                 ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  saveAllPeriodDates(allPeriodDates);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const HomeScreen()));
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 80),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      '저장',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                const SizedBox(
+                  height: 100,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    saveAllPeriodDates(allPeriodDates);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomeScreen()));
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 80),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        '저장',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),

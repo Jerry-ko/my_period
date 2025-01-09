@@ -19,19 +19,6 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
 
   initPrefs() async {
     prefs = await SharedPreferences.getInstance();
-    final int? period = prefs.getInt('period');
-
-    if (period != null) {
-      int periodIndex = periodList.indexOf(period);
-      setState(() {
-        _scrollController =
-            FixedExtentScrollController(initialItem: periodIndex);
-        selectedPeriodIndex = periodIndex;
-        isLoading = false;
-      });
-      return;
-    }
-    await prefs.setInt('period', 28);
   }
 
   @override
@@ -44,17 +31,14 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const CircularProgressIndicator();
-    }
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(40),
-          child: Column(
-            children: [
-              Expanded(
-                child: Column(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(40),
+            child: Column(
+              children: [
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(
@@ -126,36 +110,39 @@ class _MenstrualCycleState extends State<MenstrualCycle> {
                         ),
                       ],
                     ),
+                    const SizedBox(
+                      height: 80,
+                    ),
                   ],
                 ),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MentsrualDayScreen(),
+                GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MentsrualDayScreen(),
+                    ),
                   ),
-                ),
-                child: Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(15),
-                    child: Text(
-                      '다음',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(15),
+                      child: Text(
+                        '다음',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

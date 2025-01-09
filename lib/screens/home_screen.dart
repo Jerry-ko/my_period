@@ -298,76 +298,81 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              const SizedBox(
-                height: 80,
-              ),
-              TableCalendar(
-                locale: 'ko_KR',
-                firstDay: DateTime.utc(2024, 1, 1),
-                lastDay: DateTime.utc(2029, 12, 31),
-                focusedDay: DateTime.now(),
-                calendarBuilders: CalendarBuilders(
-                  defaultBuilder: (context, day, focusedDay) {
-                    for (var range in selectedRanges) {
-                      if (range['start'] != null &&
-                          day.isAfter(range['start']!) &&
-                          range['end'] != null &&
-                          day.isBefore(
-                              range['end']!.add(const Duration(days: 1)))) {
-                        return Container(
-                          width: 50,
-                          decoration: const BoxDecoration(
-                            color: Colors.amber,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(child: Text(day.day.toString())),
-                        );
+        SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const SizedBox(
+                  height: 80,
+                ),
+                TableCalendar(
+                  locale: 'ko_KR',
+                  firstDay: DateTime.utc(2024, 1, 1),
+                  lastDay: DateTime.utc(2029, 12, 31),
+                  focusedDay: DateTime.now(),
+                  calendarBuilders: CalendarBuilders(
+                    defaultBuilder: (context, day, focusedDay) {
+                      for (var range in selectedRanges) {
+                        if (range['start'] != null &&
+                            day.isAfter(range['start']!) &&
+                            range['end'] != null &&
+                            day.isBefore(
+                                range['end']!.add(const Duration(days: 1)))) {
+                          return Container(
+                            width: 50,
+                            decoration: const BoxDecoration(
+                              color: Colors.amber,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(child: Text(day.day.toString())),
+                          );
+                        }
                       }
-                    }
-                    return null;
+                      return null;
+                    },
+                  ),
+                  rowHeight: 90,
+                  headerStyle: const HeaderStyle(
+                    titleTextStyle: TextStyle(
+                      fontSize: 18,
+                    ),
+                    formatButtonVisible: false,
+                    titleCentered: true,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const EditPeriodDate(),
+                            fullscreenDialog: true));
                   },
-                ),
-                rowHeight: 90,
-                headerStyle: const HeaderStyle(
-                  titleTextStyle: TextStyle(
-                    fontSize: 18,
-                  ),
-                  formatButtonVisible: false,
-                  titleCentered: true,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const EditPeriodDate(),
-                          fullscreenDialog: true));
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      '생리기간 편집',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        '생리기간 편집',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              )
-            ],
+                const SizedBox(
+                  height: 30,
+                ),
+              ],
+            ),
           ),
         )
       ][currentPageIndex],
